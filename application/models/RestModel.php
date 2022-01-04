@@ -166,6 +166,27 @@ class RestModel extends CI_Model
         return $this->db->get()->result_array();
     }
 
+    public function setTeamModel($userID)
+    {
+        $data = array(
+            'userID' => $userID,
+            'log' => date('Y/m/d H:i:s e')
+        );
+
+        if ($this->db->insert('teams', $data)) {
+            $teamID = $this->db->insert_id();
+            $data = array(
+                'teamID' => $teamID,
+                'teamRequest' => 0
+            );
+
+            $this->db->where('userID', $userID);
+            $this->db->update('users', $data);
+        }
+        
+        return $teamID;
+    }
+
     public function getTeamModel($teamID)
     {
         $data = [];

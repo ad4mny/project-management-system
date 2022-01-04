@@ -16,6 +16,7 @@ $route['addTask'] = 'RestController/addTask';
 $route['getAssigned'] = 'RestController/getAssigned';
 $route['viewAssigned'] = 'RestController/viewAssigned';
 
+$route['setTeam'] = 'RestController/setTeam';
 $route['getTeam'] = 'RestController/getTeam';
 $route['getRequest'] = 'RestController/getRequest';
 $route['addMember'] = 'RestController/addMember';

@@ -92,6 +92,14 @@ class RestController extends CI_Controller
         exit;
     }
 
+    public function setTeam()
+    {
+        $userID = $this->input->post('userID');
+
+        echo json_encode($this->RestModel->setTeamModel($userID));
+        exit;
+    }
+    
     public function getTeam()
     {
         $teamID = $this->input->post('teamID');
