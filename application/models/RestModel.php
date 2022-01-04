@@ -79,11 +79,13 @@ class RestModel extends CI_Model
             array_push($taskID, $value['taskID']);
         }
 
-        $this->db->select('*');
-        $this->db->from('assigns');
-        $this->db->join('users', 'users.userID = assigns.userID');
-        $this->db->where_in('taskID', $taskID);
-        array_push($data, $this->db->get()->result_array());
+        if ($taskID != null) {
+            $this->db->select('*');
+            $this->db->from('assigns');
+            $this->db->join('users', 'users.userID = assigns.userID');
+            $this->db->where_in('taskID', $taskID);
+            array_push($data, $this->db->get()->result_array());
+        }
 
         return $data;
     }
@@ -114,34 +116,39 @@ class RestModel extends CI_Model
 
             if ($this->db->insert_batch('projectMembers', $projectMembers)) {
 
-                $taskData = [];
+                if ($taskName != null) {
 
-                foreach ($taskName as $task) {
-                    array_push($taskData, array(
-                        'projectID' => $projectID,
-                        'taskName' => $task,
-                        'log' => date('Y/m/d H:i:s e')
-                    ));
-                }
+                    $taskData = [];
 
-                if ($this->db->insert_batch('tasks', $taskData)) {
-
-                    $this->db->select('taskID');
-                    $this->db->from('tasks');
-                    $this->db->where('projectID', $projectID);
-                    $data = $this->db->get()->result_array();
-
-                    $assignsData = [];
-
-                    foreach ($taskMember as $key => $value) {
-                        array_push($assignsData, array(
-                            'taskID' => $data[$key]['taskID'],
-                            'userID' => $value['id'],
+                    foreach ($taskName as $task) {
+                        array_push($taskData, array(
+                            'projectID' => $projectID,
+                            'taskName' => $task,
                             'log' => date('Y/m/d H:i:s e')
                         ));
                     }
 
-                    return $this->db->insert_batch('assigns', $assignsData);
+                    if ($this->db->insert_batch('tasks', $taskData)) {
+
+                        $this->db->select('taskID');
+                        $this->db->from('tasks');
+                        $this->db->where('projectID', $projectID);
+                        $data = $this->db->get()->result_array();
+
+                        $assignsData = [];
+
+                        foreach ($taskMember as $key => $value) {
+                            array_push($assignsData, array(
+                                'taskID' => $data[$key]['taskID'],
+                                'userID' => $value['id'],
+                                'log' => date('Y/m/d H:i:s e')
+                            ));
+                        }
+
+                        return $this->db->insert_batch('assigns', $assignsData);
+                    }
+                } else {
+                    return true;
                 }
             }
         }
@@ -161,18 +168,34 @@ class RestModel extends CI_Model
 
     public function getTeamModel($teamID)
     {
+        $data = [];
+        $this->db->select('userID');
+        $this->db->from('teams');
+        $this->db->where('teamID', $teamID);
+        $data = $this->db->get()->row_array();
+
         $this->db->select('userID, firstName, lastName');
         $this->db->from('users');
         $this->db->where('teamID', $teamID);
-        return $this->db->get()->result_array();
+        array_push($data, $this->db->get()->result_array());
+
+        return $data;
     }
 
     public function getRequestModel($teamID)
     {
+        $data = [];
+        $this->db->select('userID');
+        $this->db->from('teams');
+        $this->db->where('teamID', $teamID);
+        $data = $this->db->get()->row_array();
+
         $this->db->select('userID, firstName, lastName');
         $this->db->from('users');
         $this->db->where('teamRequest', $teamID);
-        return $this->db->get()->result_array();
+        array_push($data, $this->db->get()->result_array());
+
+        return $data;
     }
 
     public function addMemberModel($userID, $teamID)
