@@ -55,17 +55,33 @@ class RestController extends CI_Controller
 
     public function getWorkspace()
     {
-        # code...
+        $userID = $this->input->post('userID');
+
+        echo json_encode($this->RestModel->getWorkspaceModel($userID));
+        exit;
     }
 
     public function viewWorkspace()
     {
-        # code...
+        $projectID = $this->input->post('projectID');
+
+        echo json_encode($this->RestModel->viewWorkspaceModel($projectID));
+        exit;
     }
 
     public function setWorkspace()
     {
-        # code...
+        $userID = $this->input->post('userID');
+        $projectName = $this->input->post('projectName');
+        $projectDesc = $this->input->post('projectDesc');
+        $startDate = $this->input->post('startDate');
+        $endDate = $this->input->post('endDate');
+        $projectMember = json_decode($this->input->post('projectMember'), true);
+        $taskName = $this->input->post('taskName');
+        $taskMember = json_decode($this->input->post('taskMember'), true);
+ 
+        echo json_encode($this->RestModel->setWorkspaceModel($userID, $projectName, $projectDesc, $startDate, $endDate, $projectMember, $taskName, $taskMember));
+        exit;
     }
 
     public function addTask()
@@ -85,7 +101,10 @@ class RestController extends CI_Controller
 
     public function getTeam()
     {
-        # code...
+        $teamID = $this->input->post('teamID');
+
+        echo json_encode($this->RestModel->getTeamModel($teamID));
+        exit;
     }
 
     public function addMember()
