@@ -79,14 +79,9 @@ class RestController extends CI_Controller
         $projectMember = json_decode($this->input->post('projectMember'), true);
         $taskName = $this->input->post('taskName');
         $taskMember = json_decode($this->input->post('taskMember'), true);
- 
+
         echo json_encode($this->RestModel->setWorkspaceModel($userID, $projectName, $projectDesc, $startDate, $endDate, $projectMember, $taskName, $taskMember));
         exit;
-    }
-
-    public function addTask()
-    {
-        # code...
     }
 
     public function getAssigned()
@@ -97,11 +92,6 @@ class RestController extends CI_Controller
         exit;
     }
 
-    public function viewAssigned()
-    {
-        # code...
-    }
-
     public function getTeam()
     {
         $teamID = $this->input->post('teamID');
@@ -110,24 +100,34 @@ class RestController extends CI_Controller
         exit;
     }
 
+    public function getRequest()
+    {
+        $teamID = $this->input->post('teamID');
+
+        echo json_encode($this->RestModel->getRequestModel($teamID));
+        exit;
+    }
+
     public function addMember()
     {
         # code...
     }
 
-    public function acceptMember()
+    public function approveMember()
     {
-        # code...
-    }
+        $userID = $this->input->post('userID');
+        $teamID = $this->input->post('teamID');
 
-    public function rejectMember()
-    {
-        # code...
+        echo json_encode($this->RestModel->approveMemberModel($userID, $teamID));
+        exit;
     }
 
     public function removeMember()
     {
-        # code...
+        $userID = $this->input->post('userID');
+
+        echo json_encode($this->RestModel->removeMemberModel($userID));
+        exit;
     }
 
     public function searchMember()

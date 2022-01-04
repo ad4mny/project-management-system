@@ -147,11 +147,6 @@ class RestModel extends CI_Model
         }
     }
 
-    public function addTaskModel()
-    {
-        # code...
-    }
-
     public function getAssignedModel($userID)
     {
         $this->db->select('GROUP_CONCAT(taskName) as taskName, GROUP_CONCAT(projectName) as projectName, GROUP_CONCAT(firstName) as firstName, GROUP_CONCAT(projectStartDate) as projectStartDate, GROUP_CONCAT(projectEndDate) as projectEndDate');
@@ -164,11 +159,6 @@ class RestModel extends CI_Model
         return $this->db->get()->result_array();
     }
 
-    public function viewAssignedModel()
-    {
-        # code...
-    }
-
     public function getTeamModel($teamID)
     {
         $this->db->select('userID, firstName, lastName');
@@ -177,24 +167,39 @@ class RestModel extends CI_Model
         return $this->db->get()->result_array();
     }
 
+    public function getRequestModel($teamID)
+    {
+        $this->db->select('userID, firstName, lastName');
+        $this->db->from('users');
+        $this->db->where('teamRequest', $teamID);
+        return $this->db->get()->result_array();
+    }
+
     public function addMemberModel()
     {
         # code...
     }
 
-    public function acceptMemberModel()
+    public function approveMemberModel($userID, $teamID)
     {
-        # code...
+        $data = array(
+            'teamID' => $teamID,
+            'teamRequest' => 0
+        );
+
+        $this->db->where('userID', $userID);
+        return $this->db->update('users', $data);
     }
 
-    public function rejectMemberModel()
+    public function removeMemberModel($userID)
     {
-        # code...
-    }
+        $data = array(
+            'teamID' => NULL,
+            'teamRequest' => NULL
+        );
 
-    public function removeMemberModel()
-    {
-        # code...
+        $this->db->where('userID', $userID);
+        return $this->db->update('users', $data);
     }
 
     public function searchMemberModel()
