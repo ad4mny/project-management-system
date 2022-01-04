@@ -110,7 +110,11 @@ class RestController extends CI_Controller
 
     public function addMember()
     {
-        # code...
+        $userID = $this->input->post('userID');
+        $teamID = $this->input->post('teamID');
+
+        echo json_encode($this->RestModel->addMemberModel($userID, $teamID));
+        exit;
     }
 
     public function approveMember()
@@ -130,8 +134,11 @@ class RestController extends CI_Controller
         exit;
     }
 
-    public function searchMember()
+    public function searchUser()
     {
-        # code...
+        $query = $this->input->post('query');
+
+        echo json_encode($this->RestModel->searchUserModel($query));
+        exit;
     }
 }

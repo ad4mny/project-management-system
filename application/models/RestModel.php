@@ -175,9 +175,15 @@ class RestModel extends CI_Model
         return $this->db->get()->result_array();
     }
 
-    public function addMemberModel()
+    public function addMemberModel($userID, $teamID)
     {
-        # code...
+        $data = array(
+            'teamID' => $teamID,
+            'teamRequest' => 0
+        );
+
+        $this->db->where('userID', $userID);
+        return $this->db->update('users', $data);
     }
 
     public function approveMemberModel($userID, $teamID)
@@ -202,8 +208,13 @@ class RestModel extends CI_Model
         return $this->db->update('users', $data);
     }
 
-    public function searchMemberModel()
+    public function searchUserModel($query)
     {
-        # code...
+        $this->db->select('*');
+        $this->db->from('users');
+        $this->db->like('firstName', $query);
+        $this->db->where('teamID', NULL);
+        $this->db->where('teamRequest', NULL);
+        return $this->db->get()->result_array();
     }
 }
