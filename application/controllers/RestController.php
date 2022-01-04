@@ -91,7 +91,10 @@ class RestController extends CI_Controller
 
     public function getAssigned()
     {
-        # code...
+        $userID = $this->input->post('userID');
+
+        echo json_encode($this->RestModel->getAssignedModel($userID));
+        exit;
     }
 
     public function viewAssigned()

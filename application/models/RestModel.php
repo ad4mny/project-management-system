@@ -152,9 +152,16 @@ class RestModel extends CI_Model
         # code...
     }
 
-    public function getAssignedModel()
+    public function getAssignedModel($userID)
     {
-        # code...
+        $this->db->select('GROUP_CONCAT(taskName) as taskName, GROUP_CONCAT(projectName) as projectName, GROUP_CONCAT(firstName) as firstName, GROUP_CONCAT(projectStartDate) as projectStartDate, GROUP_CONCAT(projectEndDate) as projectEndDate');
+        $this->db->from('assigns');
+        $this->db->join('tasks', 'tasks.taskID = assigns.taskID');
+        $this->db->join('users', 'users.userID = assigns.userID');
+        $this->db->join('projects', 'projects.projectID = tasks.projectID');
+        $this->db->where('projects.userID !=', $userID);
+        $this->db->group_by('assigns.taskID');
+        return $this->db->get()->result_array();
     }
 
     public function viewAssignedModel()
