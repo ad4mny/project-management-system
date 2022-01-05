@@ -10,6 +10,7 @@ $route['register'] = 'RestController/register';
 
 $route['getWorkspace'] = 'RestController/getWorkspace';
 $route['viewWorkspace'] = 'RestController/viewWorkspace';
+$route['removeWorkspace'] = 'RestController/removeWorkspace';
 $route['setWorkspace'] = 'RestController/setWorkspace';
 $route['addTask'] = 'RestController/addTask';
 

@@ -90,6 +90,12 @@ class RestModel extends CI_Model
         return $data;
     }
 
+    public function removeWorkspaceModel($projectID)
+    {
+        $this->db->where('projectID', $projectID);
+        return $this->db->delete('projects');
+    }
+
     public function setWorkspaceModel($userID, $projectName, $projectDesc, $startDate, $endDate, $projectMember, $taskName, $taskMember)
     {
         $projectData = array(

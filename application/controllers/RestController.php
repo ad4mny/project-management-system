@@ -68,6 +68,14 @@ class RestController extends CI_Controller
         echo json_encode($this->RestModel->viewWorkspaceModel($projectID));
         exit;
     }
+    
+    public function removeWorkspace()
+    {
+        $projectID = $this->input->post('projectID');
+
+        echo json_encode($this->RestModel->removeWorkspaceModel($projectID));
+        exit;
+    }
 
     public function setWorkspace()
     {
