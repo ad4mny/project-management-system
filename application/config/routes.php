@@ -18,6 +18,7 @@ $route['viewAssigned'] = 'RestController/viewAssigned';
 
 $route['setTeam'] = 'RestController/setTeam';
 $route['getTeam'] = 'RestController/getTeam';
+$route['removeTeam'] = 'RestController/removeTeam';
 $route['getRequest'] = 'RestController/getRequest';
 $route['addMember'] = 'RestController/addMember';
 $route['approveMember'] = 'RestController/approveMember';

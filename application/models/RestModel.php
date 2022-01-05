@@ -183,7 +183,7 @@ class RestModel extends CI_Model
             $this->db->where('userID', $userID);
             $this->db->update('users', $data);
         }
-        
+
         return $teamID;
     }
 
@@ -201,6 +201,28 @@ class RestModel extends CI_Model
         array_push($data, $this->db->get()->result_array());
 
         return $data;
+    }
+
+    public function removeTeamModel($teamID)
+    {
+        $this->db->select('userID');
+        $this->db->from('users');
+        $this->db->where('teamID', $teamID);
+        $result = $this->db->get()->result_array();
+
+        $this->db->where('teamID', $teamID);
+        $this->db->delete('teams');
+
+        $data = array(
+            'teamRequest' => NULL
+        );
+
+        foreach ($result as $row) {
+            $this->db->where('userID', $row['userID']);
+            $this->db->update('users', $data);
+        }
+
+        return true;
     }
 
     public function getRequestModel($teamID)
