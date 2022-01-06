@@ -25,3 +25,5 @@ $route['addMember'] = 'RestController/addMember';
 $route['approveMember'] = 'RestController/approveMember';
 $route['removeMember'] = 'RestController/removeMember';
 $route['searchUser'] = 'RestController/searchUser';
+
+$route['updateProfile'] = 'RestController/updateProfile';

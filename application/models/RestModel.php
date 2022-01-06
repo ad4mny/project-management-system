@@ -289,4 +289,17 @@ class RestModel extends CI_Model
         $this->db->where('teamRequest', NULL);
         return $this->db->get()->result_array();
     }
+
+    public function updateProfileModel($userID, $firstName, $lastName, $username)
+    {
+        $data = array(
+            'firstName' => $firstName,
+            'lastName' => $lastName,
+            'username' => $username,
+            'log' => date('Y/m/d H:i:s e')
+        );
+
+        $this->db->where('userID', $userID);
+        return $this->db->update('users', $data);
+    }
 }

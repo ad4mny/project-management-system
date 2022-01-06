@@ -68,7 +68,7 @@ class RestController extends CI_Controller
         echo json_encode($this->RestModel->viewWorkspaceModel($projectID));
         exit;
     }
-    
+
     public function removeWorkspace()
     {
         $projectID = $this->input->post('projectID');
@@ -164,5 +164,26 @@ class RestController extends CI_Controller
 
         echo json_encode($this->RestModel->searchUserModel($query));
         exit;
+    }
+
+    public function updateProfile()
+    {
+        $userID = $this->input->post('userID');
+        $firstName = $this->input->post('firstName');
+        $lastName = $this->input->post('lastName');
+        $username = $this->input->post('username');
+
+        if ($this->checkUsername($username) !== null) {
+            echo json_encode('Username has been taken, please choose another username.');
+            exit;
+        } else {
+            if ($this->RestModel->updateProfileModel($userID, $firstName, $lastName, $username) === true) {
+                echo json_encode(array($firstName, $lastName, $username));
+                exit;
+            } else {
+                echo json_encode('Update profile failed, please register again.');
+                exit;
+            }
+        }
     }
 }
