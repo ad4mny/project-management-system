@@ -71,35 +71,22 @@ class RestModel extends CI_Model
 
         array_push($data, $this->db->get()->result_array());
 
-        $this->db->select('*');
+        $this->db->select('GROUP_CONCAT(taskName) as taskName, GROUP_CONCAT(firstName) as firstName, GROUP_CONCAT(assigns.userID) as userID');
         $this->db->from('tasks');
+        $this->db->join('assigns', 'assigns.taskID = tasks.taskID');
+        $this->db->join('users', 'users.userID = assigns.userID');
+        $this->db->group_by('tasks.taskID');
         $this->db->where('workspaceID', $workspaceID);
 
         array_push($data, $this->db->get()->result_array());
 
-        $taskID = [];
-
-        foreach ($data[2] as $key => $value) {
-            array_push($taskID, $value['taskID']);
-        }
-
-        if ($taskID != null) {
-
-            $this->db->select('*');
-            $this->db->from('assigns');
-            $this->db->join('users', 'users.userID = assigns.userID');
-            $this->db->where_in('taskID', $taskID);
-
-            array_push($data, $this->db->get()->result_array());
-        }
-
         return $data;
     }
 
-    public function removeWorkspaceModel($projectID)
+    public function removeWorkspaceModel($workspaceID)
     {
-        $this->db->where('projectID', $projectID);
-        return $this->db->delete('projects');
+        $this->db->where('workspaceID', $workspaceID);
+        return $this->db->delete('workspaces');
     }
 
     public function setWorkspaceModel($userID, $workspaceName, $workspaceDesc, $startDate, $endDate, $workspaceMember, $taskName, $taskMember)
@@ -161,12 +148,12 @@ class RestModel extends CI_Model
 
                         foreach ($taskMember as $key => $value) {
                             array_push($assigns, array(
-                                'taskID' => $data[$key]['taskID'],
+                                'taskID' => $data[$value['task'] - 1]['taskID'],
                                 'userID' => $value['userid'],
                                 'log' => date('Y/m/d H:i:s e')
                             ));
                         }
-                        
+
                         // Add task member assigned
                         return $this->db->insert_batch('assigns', $assigns);
                     }
@@ -179,11 +166,11 @@ class RestModel extends CI_Model
 
     public function getAssignedModel($userID)
     {
-        $this->db->select('GROUP_CONCAT(taskName) as taskName, GROUP_CONCAT(projectName) as projectName, GROUP_CONCAT(firstName) as firstName, GROUP_CONCAT(projectStartDate) as projectStartDate, GROUP_CONCAT(projectEndDate) as projectEndDate');
+        $this->db->select('GROUP_CONCAT(taskName) as taskName, GROUP_CONCAT(workspaceName) as workspaceName, GROUP_CONCAT(firstName) as firstName, GROUP_CONCAT(startDate) as startDate, GROUP_CONCAT(endDate) as endDate');
         $this->db->from('assigns');
         $this->db->join('tasks', 'tasks.taskID = assigns.taskID');
         $this->db->join('users', 'users.userID = assigns.userID');
-        $this->db->join('projects', 'projects.projectID = tasks.projectID');
+        $this->db->join('workspaces', 'workspaces.workspaceID = tasks.workspaceID');
         $this->db->where('assigns.userID', $userID);
         $this->db->group_by('assigns.taskID');
         return $this->db->get()->result_array();
