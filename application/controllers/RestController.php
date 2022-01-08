@@ -63,32 +63,32 @@ class RestController extends CI_Controller
 
     public function viewWorkspace()
     {
-        $projectID = $this->input->post('projectID');
+        $workspaceID = $this->input->post('workspaceID');
 
-        echo json_encode($this->RestModel->viewWorkspaceModel($projectID));
+        echo json_encode($this->RestModel->viewWorkspaceModel($workspaceID));
         exit;
     }
 
     public function removeWorkspace()
     {
-        $projectID = $this->input->post('projectID');
+        $workspaceID = $this->input->post('workspaceID');
 
-        echo json_encode($this->RestModel->removeWorkspaceModel($projectID));
+        echo json_encode($this->RestModel->removeWorkspaceModel($workspaceID));
         exit;
     }
 
     public function setWorkspace()
     {
         $userID = $this->input->post('userID');
-        $projectName = $this->input->post('projectName');
-        $projectDesc = $this->input->post('projectDesc');
+        $workspaceName = $this->input->post('workspaceName');
+        $workspaceDesc = $this->input->post('workspaceDesc');
         $startDate = $this->input->post('startDate');
         $endDate = $this->input->post('endDate');
-        $projectMember = json_decode($this->input->post('projectMember'), true);
+        $workspaceMember = json_decode($this->input->post('workspaceMember'), true);
         $taskName = $this->input->post('taskName');
         $taskMember = json_decode($this->input->post('taskMember'), true);
 
-        echo json_encode($this->RestModel->setWorkspaceModel($userID, $projectName, $projectDesc, $startDate, $endDate, $projectMember, $taskName, $taskMember));
+        echo json_encode($this->RestModel->setWorkspaceModel($userID, $workspaceName, $workspaceDesc, $startDate, $endDate, $workspaceMember, $taskName, $taskMember));
         exit;
     }
 
@@ -108,11 +108,11 @@ class RestController extends CI_Controller
         exit;
     }
 
-    public function getTeam()
+    public function getFriend()
     {
-        $teamID = $this->input->post('teamID');
+        $userID = $this->input->post('userID');
 
-        echo json_encode($this->RestModel->getTeamModel($teamID));
+        echo json_encode($this->RestModel->getFriendModel($userID));
         exit;
     }
 

@@ -35,42 +35,46 @@ class RestModel extends CI_Model
 
     public function getWorkspaceModel($userID)
     {
-        $data = [];
+        $data[0] = [];
+        $data[1] = [];
         $this->db->select('*');
-        $this->db->from('projects');
-        $this->db->where('projects.userID', $userID);
+        $this->db->from('workspaces');
+        $this->db->where('userID', $userID);
 
-        $data['project'] = $this->db->get()->result_array();
+        $data[0] = $this->db->get()->result_array();
 
-        foreach ($data['project'] as $row) {
+        foreach ($data[0] as $row) {
             $this->db->select('*');
-            $this->db->from('projectMembers');
-            $this->db->join('users', 'users.userID = projectMembers.userID');
-            $this->db->where('projectMembers.projectID', $row['projectID']);
-            array_push($data, $this->db->get()->result_array());
+            $this->db->from('teams');
+            $this->db->join('users', 'users.userID = teams.userID');
+            $this->db->where('teams.workspaceID', $row['workspaceID']);
+            array_push($data[1], $this->db->get()->result_array());
         }
 
         return $data;
     }
 
-    public function viewWorkspaceModel($projectID)
+    public function viewWorkspaceModel($workspaceID)
     {
         $data = [];
+
         $this->db->select('*');
-        $this->db->from('projects');
-        $this->db->where('projectID', $projectID);
+        $this->db->from('workspaces');
+        $this->db->where('workspaceID', $workspaceID);
 
         array_push($data, $this->db->get()->result_array());
 
         $this->db->select('*');
-        $this->db->from('projectMembers');
-        $this->db->join('users', 'users.userID = projectMembers.userID');
-        $this->db->where('projectMembers.projectID', $projectID);
+        $this->db->from('teams');
+        $this->db->join('users', 'users.userID = teams.userID');
+        $this->db->where('teams.workspaceID', $workspaceID);
+
         array_push($data, $this->db->get()->result_array());
 
         $this->db->select('*');
         $this->db->from('tasks');
-        $this->db->where('projectID', $projectID);
+        $this->db->where('workspaceID', $workspaceID);
+
         array_push($data, $this->db->get()->result_array());
 
         $taskID = [];
@@ -80,10 +84,12 @@ class RestModel extends CI_Model
         }
 
         if ($taskID != null) {
+
             $this->db->select('*');
             $this->db->from('assigns');
             $this->db->join('users', 'users.userID = assigns.userID');
             $this->db->where_in('taskID', $taskID);
+
             array_push($data, $this->db->get()->result_array());
         }
 
@@ -96,62 +102,73 @@ class RestModel extends CI_Model
         return $this->db->delete('projects');
     }
 
-    public function setWorkspaceModel($userID, $projectName, $projectDesc, $startDate, $endDate, $projectMember, $taskName, $taskMember)
+    public function setWorkspaceModel($userID, $workspaceName, $workspaceDesc, $startDate, $endDate, $workspaceMember, $taskName, $taskMember)
     {
-        $projectData = array(
+        $workspaces = array(
             'userID' => $userID,
-            'projectName' => $projectName,
-            'projectDesc' => $projectDesc,
-            'projectStartDate' => $startDate,
-            'projectEndDate' => $endDate,
+            'workspaceName' => $workspaceName,
+            'workspaceDesc' => $workspaceDesc,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
             'log' => date('Y/m/d H:i:s e')
         );
 
-        if ($this->db->insert('projects', $projectData)) {
+        // Add workspace information
+        $this->db->insert('workspaces', $workspaces);
 
-            $projectID = $this->db->insert_id();
-            $projectMembers = [];
+        if ($this->db->affected_rows() > 0) {
 
-            foreach ($projectMember as $key => $value) {
-                array_push($projectMembers, array(
-                    'projectID' => $projectID,
-                    'userID' => $value['id'],
+            $workspaceID = $this->db->insert_id();
+            $teams = [];
+
+            foreach ($workspaceMember as $key => $value) {
+                array_push($teams, array(
+                    'workspaceID' => $workspaceID,
+                    'userID' => $value['userid'],
                     'log' => date('Y/m/d H:i:s e')
                 ));
             }
 
-            if ($this->db->insert_batch('projectMembers', $projectMembers)) {
+            // Add workspace team member
+            $this->db->insert_batch('teams', $teams);
 
+            if ($this->db->affected_rows() > 0) {
+
+                // Check if workspace have additional task
                 if ($taskName != null) {
 
-                    $taskData = [];
+                    $tasks = [];
 
                     foreach ($taskName as $task) {
-                        array_push($taskData, array(
-                            'projectID' => $projectID,
+                        array_push($tasks, array(
+                            'workspaceID' => $workspaceID,
                             'taskName' => $task,
                             'log' => date('Y/m/d H:i:s e')
                         ));
                     }
 
-                    if ($this->db->insert_batch('tasks', $taskData)) {
+                    // Add workspace tasks
+                    $this->db->insert_batch('tasks', $tasks);
+
+                    if ($this->db->affected_rows() > 0) {
 
                         $this->db->select('taskID');
                         $this->db->from('tasks');
-                        $this->db->where('projectID', $projectID);
+                        $this->db->where('workspaceID', $workspaceID);
                         $data = $this->db->get()->result_array();
 
-                        $assignsData = [];
+                        $assigns = [];
 
                         foreach ($taskMember as $key => $value) {
-                            array_push($assignsData, array(
+                            array_push($assigns, array(
                                 'taskID' => $data[$key]['taskID'],
-                                'userID' => $value['id'],
+                                'userID' => $value['userid'],
                                 'log' => date('Y/m/d H:i:s e')
                             ));
                         }
-
-                        return $this->db->insert_batch('assigns', $assignsData);
+                        
+                        // Add task member assigned
+                        return $this->db->insert_batch('assigns', $assigns);
                     }
                 } else {
                     return true;
@@ -193,20 +210,14 @@ class RestModel extends CI_Model
         return $teamID;
     }
 
-    public function getTeamModel($teamID)
+    public function getFriendModel($userID)
     {
-        $data = [];
-        $this->db->select('userID');
-        $this->db->from('teams');
-        $this->db->where('teamID', $teamID);
-        $data = $this->db->get()->row_array();
-
-        $this->db->select('userID, firstName, lastName');
-        $this->db->from('users');
-        $this->db->where('teamID', $teamID);
-        array_push($data, $this->db->get()->result_array());
-
-        return $data;
+        $this->db->select('users.userID, users.firstName, users.lastName');
+        $this->db->from('friends');
+        $this->db->join('users', 'users.userID = friends.requestID');
+        $this->db->where('friends.status', 1);
+        $this->db->where('friends.userID', $userID);
+        return $this->db->get()->result_array();
     }
 
     public function removeTeamModel($teamID)
