@@ -188,28 +188,7 @@ class RestModel extends CI_Model
         return $this->db->get()->result_array();
     }
 
-    public function setTeamModel($userID)
-    {
-        $data = array(
-            'userID' => $userID,
-            'log' => date('Y/m/d H:i:s e')
-        );
-
-        if ($this->db->insert('teams', $data)) {
-            $teamID = $this->db->insert_id();
-            $data = array(
-                'teamID' => $teamID,
-                'teamRequest' => 0
-            );
-
-            $this->db->where('userID', $userID);
-            $this->db->update('users', $data);
-        }
-
-        return $teamID;
-    }
-
-    public function getFriendModel($userID)
+    public function getFriendListModel($userID)
     {
         $this->db->select('users.userID, users.firstName, users.lastName');
         $this->db->from('friends');
@@ -219,84 +198,40 @@ class RestModel extends CI_Model
         return $this->db->get()->result_array();
     }
 
-    public function removeTeamModel($teamID)
+    public function getFriendRequestModel($userID)
     {
-        $this->db->select('userID');
-        $this->db->from('users');
-        $this->db->where('teamID', $teamID);
-        $result = $this->db->get()->result_array();
-
-        $this->db->where('teamID', $teamID);
-        $this->db->delete('teams');
-
-        $data = array(
-            'teamRequest' => NULL
-        );
-
-        foreach ($result as $row) {
-            $this->db->where('userID', $row['userID']);
-            $this->db->update('users', $data);
-        }
-
-        return true;
+        $this->db->select('users.userID, users.firstName, users.lastName');
+        $this->db->from('friends');
+        $this->db->join('users', 'users.userID = friends.requestID');
+        $this->db->where('friends.status', 0);
+        $this->db->where('friends.userID', $userID);
+        return $this->db->get()->result_array();
     }
 
-    public function getRequestModel($teamID)
+    public function addFriendModel($userID, $friendID)
     {
-        $data = [];
-        $this->db->select('userID');
-        $this->db->from('teams');
-        $this->db->where('teamID', $teamID);
-        $data = $this->db->get()->row_array();
+        $data = array(
+            'status' => 1
+        );
 
+        $this->db->where('userID', $userID);
+        $this->db->where('requestID', $friendID);
+        return $this->db->update('friends', $data);
+    }
+
+    public function removeFriendModel($userID, $friendID)
+    {
+        $this->db->where('userID', $userID);
+        $this->db->where('requestID', $friendID);
+        return $this->db->delete('friends');
+    }
+
+    public function searchUserModel($userID, $query)
+    {
         $this->db->select('userID, firstName, lastName');
         $this->db->from('users');
-        $this->db->where('teamRequest', $teamID);
-        array_push($data, $this->db->get()->result_array());
-
-        return $data;
-    }
-
-    public function addMemberModel($userID, $teamID)
-    {
-        $data = array(
-            'teamID' => $teamID,
-            'teamRequest' => 0
-        );
-
-        $this->db->where('userID', $userID);
-        return $this->db->update('users', $data);
-    }
-
-    public function approveMemberModel($userID, $teamID)
-    {
-        $data = array(
-            'teamID' => $teamID,
-            'teamRequest' => 0
-        );
-
-        $this->db->where('userID', $userID);
-        return $this->db->update('users', $data);
-    }
-
-    public function removeMemberModel($userID)
-    {
-        $data = array(
-            'teamID' => NULL,
-            'teamRequest' => NULL
-        );
-
-        $this->db->where('userID', $userID);
-        return $this->db->update('users', $data);
-    }
-
-    public function searchUserModel($query)
-    {
-        $this->db->select('*');
-        $this->db->from('users');
+        $this->db->where('userID !=', $userID);
         $this->db->like('firstName', $query);
-        $this->db->where('teamID', NULL);
-        $this->db->where('teamRequest', NULL);
         return $this->db->get()->result_array();
     }
 

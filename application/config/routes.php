@@ -17,13 +17,10 @@ $route['addTask'] = 'RestController/addTask';
 $route['getAssigned'] = 'RestController/getAssigned';
 $route['viewAssigned'] = 'RestController/viewAssigned';
 
-$route['setTeam'] = 'RestController/setTeam';
-$route['getFriend'] = 'RestController/getFriend';
-$route['removeTeam'] = 'RestController/removeTeam';
-$route['getRequest'] = 'RestController/getRequest';
-$route['addMember'] = 'RestController/addMember';
-$route['approveMember'] = 'RestController/approveMember';
-$route['removeMember'] = 'RestController/removeMember';
+$route['getFriendList'] = 'RestController/getFriendList';
+$route['getFriendRequest'] = 'RestController/getFriendRequest';
+$route['addFriend'] = 'RestController/addFriend';
+$route['removeFriend'] = 'RestController/removeFriend';
 $route['searchUser'] = 'RestController/searchUser';
 
 $route['updateProfile'] = 'RestController/updateProfile';

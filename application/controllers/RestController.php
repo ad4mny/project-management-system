@@ -100,69 +100,47 @@ class RestController extends CI_Controller
         exit;
     }
 
-    public function setTeam()
+    public function getFriendList()
     {
         $userID = $this->input->post('userID');
 
-        echo json_encode($this->RestModel->setTeamModel($userID));
+        echo json_encode($this->RestModel->getFriendListModel($userID));
         exit;
     }
 
-    public function getFriend()
+    public function getFriendRequest()
     {
         $userID = $this->input->post('userID');
+        $friendID = $this->input->post('friendID');
 
-        echo json_encode($this->RestModel->getFriendModel($userID));
+        echo json_encode($this->RestModel->getFriendRequestModel($userID, $friendID));
         exit;
     }
 
-    public function removeTeam()
-    {
-        $teamID = $this->input->post('teamID');
-
-        echo json_encode($this->RestModel->removeTeamModel($teamID));
-        exit;
-    }
-
-    public function getRequest()
-    {
-        $teamID = $this->input->post('teamID');
-
-        echo json_encode($this->RestModel->getRequestModel($teamID));
-        exit;
-    }
-
-    public function addMember()
+    public function addFriend()
     {
         $userID = $this->input->post('userID');
-        $teamID = $this->input->post('teamID');
+        $friendID = $this->input->post('friendID');
 
-        echo json_encode($this->RestModel->addMemberModel($userID, $teamID));
+        echo json_encode($this->RestModel->addFriendModel($userID, $friendID));
         exit;
     }
 
-    public function approveMember()
+    public function removeFriend()
     {
         $userID = $this->input->post('userID');
-        $teamID = $this->input->post('teamID');
+        $friendID = $this->input->post('friendID');
 
-        echo json_encode($this->RestModel->approveMemberModel($userID, $teamID));
-        exit;
-    }
-
-    public function removeMember()
-    {
-        $userID = $this->input->post('userID');
-
-        echo json_encode($this->RestModel->removeMemberModel($userID));
+        echo json_encode($this->RestModel->removeFriendModel($userID, $friendID));
         exit;
     }
 
     public function searchUser()
     {
+        $userID = $this->input->post('userID');
         $query = $this->input->post('query');
 
-        echo json_encode($this->RestModel->searchUserModel($query));
+        echo json_encode($this->RestModel->searchUserModel($userID, $query));
         exit;
     }
 
