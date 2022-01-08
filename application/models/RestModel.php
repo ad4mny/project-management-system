@@ -166,13 +166,25 @@ class RestModel extends CI_Model
 
     public function getAssignedModel($userID)
     {
-        $this->db->select('GROUP_CONCAT(taskName) as taskName, GROUP_CONCAT(workspaceName) as workspaceName, GROUP_CONCAT(firstName) as firstName, GROUP_CONCAT(startDate) as startDate, GROUP_CONCAT(endDate) as endDate');
+        $this->db->select('taskID');
+        $this->db->from('assigns');
+        $this->db->where('userID', $userID);
+        $result = $this->db->get()->result_array();
+
+        $taskIDs = [];
+
+        foreach ($result as $row) {
+            array_push($taskIDs, $row['taskID']);
+        }
+
+        $this->db->select('GROUP_CONCAT(taskName) as taskName, GROUP_CONCAT(workspaceName) as workspaceName, GROUP_CONCAT(firstName) as firstName, GROUP_CONCAT(startDate) as startDate, GROUP_CONCAT(endDate) as endDate, GROUP_CONCAT(assigns.userID) as userID');
         $this->db->from('assigns');
         $this->db->join('tasks', 'tasks.taskID = assigns.taskID');
         $this->db->join('users', 'users.userID = assigns.userID');
         $this->db->join('workspaces', 'workspaces.workspaceID = tasks.workspaceID');
-        $this->db->where('assigns.userID', $userID);
+        $this->db->where_in('assigns.taskID', $taskIDs);
         $this->db->group_by('assigns.taskID');
+
         return $this->db->get()->result_array();
     }
 
