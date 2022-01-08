@@ -171,21 +171,24 @@ class RestModel extends CI_Model
         $this->db->where('userID', $userID);
         $result = $this->db->get()->result_array();
 
-        $taskIDs = [];
+        if ($result != false || !empty($result)) {
+            $taskIDs = [];
 
-        foreach ($result as $row) {
-            array_push($taskIDs, $row['taskID']);
+            foreach ($result as $row) {
+                array_push($taskIDs, $row['taskID']);
+            }
+
+            $this->db->select('GROUP_CONCAT(taskName) as taskName, GROUP_CONCAT(workspaceName) as workspaceName, GROUP_CONCAT(firstName) as firstName, GROUP_CONCAT(startDate) as startDate, GROUP_CONCAT(endDate) as endDate, GROUP_CONCAT(assigns.userID) as userID');
+            $this->db->from('assigns');
+            $this->db->join('tasks', 'tasks.taskID = assigns.taskID');
+            $this->db->join('users', 'users.userID = assigns.userID');
+            $this->db->join('workspaces', 'workspaces.workspaceID = tasks.workspaceID');
+            $this->db->where_in('assigns.taskID', $taskIDs);
+            $this->db->group_by('assigns.taskID');
+            return $this->db->get()->result_array();
+        } else {
+            return false;
         }
-
-        $this->db->select('GROUP_CONCAT(taskName) as taskName, GROUP_CONCAT(workspaceName) as workspaceName, GROUP_CONCAT(firstName) as firstName, GROUP_CONCAT(startDate) as startDate, GROUP_CONCAT(endDate) as endDate, GROUP_CONCAT(assigns.userID) as userID');
-        $this->db->from('assigns');
-        $this->db->join('tasks', 'tasks.taskID = assigns.taskID');
-        $this->db->join('users', 'users.userID = assigns.userID');
-        $this->db->join('workspaces', 'workspaces.workspaceID = tasks.workspaceID');
-        $this->db->where_in('assigns.taskID', $taskIDs);
-        $this->db->group_by('assigns.taskID');
-
-        return $this->db->get()->result_array();
     }
 
     public function getFriendListModel($userID)
@@ -202,21 +205,67 @@ class RestModel extends CI_Model
     {
         $this->db->select('users.userID, users.firstName, users.lastName');
         $this->db->from('friends');
-        $this->db->join('users', 'users.userID = friends.requestID');
+        $this->db->join('users', 'users.userID = friends.userID');
         $this->db->where('friends.status', 0);
-        $this->db->where('friends.userID', $userID);
+        $this->db->where('friends.requestID', $userID);
         return $this->db->get()->result_array();
     }
 
     public function addFriendModel($userID, $friendID)
     {
-        $data = array(
-            'status' => 1
-        );
-
+        $this->db->select('friendID');
+        $this->db->from('friends');
         $this->db->where('userID', $userID);
         $this->db->where('requestID', $friendID);
-        return $this->db->update('friends', $data);
+        $result = $this->db->get()->row_array();
+
+        if ($result == false || empty($result)) {
+
+            $data = array(
+                'userID' => $friendID,
+                'requestID' => $userID,
+                'status' => 0
+            );
+
+            return $this->db->insert('friends', $data);
+        } else {
+            return false;
+        }
+    }
+
+    public function approveFriendModel($userID, $friendID)
+    {
+        $this->db->select('friendID');
+        $this->db->from('friends');
+        $this->db->where('userID', $userID);
+        $this->db->where('requestID', $friendID);
+        $result = $this->db->get()->row_array();
+
+        if ($result == false || empty($result)) {
+
+            $data = array(
+                'userID' => $userID,
+                'requestID' => $friendID,
+                'status' => 1
+            );
+
+            $this->db->insert('friends', $data);
+
+            if ($this->db->affected_rows() > 0) {
+
+                $data = array(
+                    'status' => 1
+                );
+
+                $this->db->where('userID', $friendID);
+                $this->db->where('requestID', $userID);
+                return $this->db->update('friends', $data);
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 
     public function removeFriendModel($userID, $friendID)

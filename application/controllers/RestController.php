@@ -126,6 +126,15 @@ class RestController extends CI_Controller
         exit;
     }
 
+    public function approveFriend()
+    {
+        $userID = $this->input->post('userID');
+        $friendID = $this->input->post('friendID');
+
+        echo json_encode($this->RestModel->approveFriendModel($userID, $friendID));
+        exit;
+    }
+
     public function removeFriend()
     {
         $userID = $this->input->post('userID');

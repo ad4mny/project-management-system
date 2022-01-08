@@ -20,6 +20,7 @@ $route['viewAssigned'] = 'RestController/viewAssigned';
 $route['getFriendList'] = 'RestController/getFriendList';
 $route['getFriendRequest'] = 'RestController/getFriendRequest';
 $route['addFriend'] = 'RestController/addFriend';
+$route['approveFriend'] = 'RestController/approveFriend';
 $route['removeFriend'] = 'RestController/removeFriend';
 $route['searchUser'] = 'RestController/searchUser';
 
