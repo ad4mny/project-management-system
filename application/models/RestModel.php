@@ -222,8 +222,8 @@ class RestModel extends CI_Model
         if ($result == false || empty($result)) {
 
             $data = array(
-                'userID' => $friendID,
-                'requestID' => $userID,
+                'userID' => $userID,
+                'requestID' => $friendID,
                 'status' => 0
             );
 
