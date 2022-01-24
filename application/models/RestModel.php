@@ -178,7 +178,14 @@ class RestModel extends CI_Model
                 array_push($taskIDs, $row['taskID']);
             }
 
-            $this->db->select('GROUP_CONCAT(taskName) as taskName, GROUP_CONCAT(workspaceName) as workspaceName, GROUP_CONCAT(firstName) as firstName, GROUP_CONCAT(startDate) as startDate, GROUP_CONCAT(endDate) as endDate, GROUP_CONCAT(assigns.userID) as userID');
+            $this->db->select('
+            GROUP_CONCAT(taskName) as taskName, 
+            GROUP_CONCAT(workspaceName) as workspaceName, 
+            GROUP_CONCAT(firstName) as firstName, 
+            GROUP_CONCAT(startDate) as startDate, 
+            GROUP_CONCAT(endDate) as endDate, 
+            GROUP_CONCAT(assigns.userID) as userID, 
+            GROUP_CONCAT(workspaces.workspaceID) as workspaceID');
             $this->db->from('assigns');
             $this->db->join('tasks', 'tasks.taskID = assigns.taskID');
             $this->db->join('users', 'users.userID = assigns.userID');
